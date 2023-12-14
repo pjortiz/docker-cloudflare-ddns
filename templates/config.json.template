@@ -1,0 +1,9 @@
+{
+  "cloudflare": [
+    ((CONFIG.ZONES))
+  ],
+  "a": ((CONFIG.IPV4.ENABLE)),
+  "aaaa": ((CONFIG.IPV6.ENABLE)),
+  "purgeUnknownRecords": ((CONFIG.PURGE_UNKNOWN_RECORD)),
+  "ttl": ((CONFIG.TTL))
+}
