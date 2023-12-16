@@ -22,30 +22,22 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
 
       - name: Get latest release version commit
-        id: get-version
+        id: get-latest-version
         run: |
           RELEASE_INFO=$(curl -s https://api.github.com/repos/timothymiller/cloudflare-ddns/releases/latest)
           VERSION=$(echo "$RELEASE_INFO" | grep '"sha":' | sed -E 's/.*"([^"]+)".*/\1/')
-          # echo "::set-output name=version::$VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          
-      - name: Create version file if it doesn't exist
-        if: steps.check-version-file.outputs.file_exists == 'false'
-        run: |
-          echo "${{ steps.get-latest-release.outputs.version }}" > base_version.txt
 
       - name: Check if version has changed
         id: check-version
         run: |
-          if [ -f version.txt ]; then
+          if [ -f base_version.txt ]; then
             CURRENT_VERSION=$(cat base_version.txt)
             if [ "${{ steps.get-version.outputs.version }}" != "$CURRENT_VERSION" ]; then
               echo "Versions differ, updating version file."
-              # echo "::set-output name=version_changed::true"
               echo "version_changed=true" >> $GITHUB_OUTPUT
             else
               echo "Versions are the same, no update needed."
-              # echo "::set-output name=version_changed::false"
               echo "version_changed=false" >> $GITHUB_OUTPUT
             fi
           else
