@@ -1,6 +1,6 @@
 # docker-cloudflare-ddns
 
-Custom Docker Compose configuration for cloudflare-ddns
+Custom Docker Compose configuration for timothymiller/cloudflare-ddns
 
 ## Base Image timothymiller/cloudflare-ddns
 
