@@ -31,8 +31,11 @@ jobs:
         id: check-version
         run: |
           if [ -f base_version.txt ]; then
+            LATEST_VERSION=${{ steps.get-latest-version.outputs.version }}
             CURRENT_VERSION=$(cat base_version.txt)
-            if [ "${{ steps.get-version.outputs.version }}" != "$CURRENT_VERSION" ]; then
+            echo "LATEST_VERSION: $LATEST_VERSION"
+            echo "CURRENT_VERSION: $CURRENT_VERSION"
+            if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
               echo "Versions differ, updating version file."
               echo "version_changed=true" >> $GITHUB_OUTPUT
             else
