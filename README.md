@@ -14,7 +14,7 @@ Custom Docker Compose configuration for cloudflare-ddns
 version: '3.9'
 services:
   cloudflare-ddns:
-    image: cloudflare-ddns:latest
+    image: pjortiz/cloudflare-ddns:latest
     container_name: cloudflare-ddns
     security_opt:
       - no-new-privileges:true
@@ -47,27 +47,9 @@ services:
       - CLOUDFLARE_CONFIG_ZONE_1_SUBDOMAIN_1_PROXIED=false
       - CLOUDFLARE_CONFIG_ZONE_1_SUBDOMAIN_2_NAME=bar2
       - CLOUDFLARE_CONFIG_ZONE_1_SUBDOMAIN_2_PROXIED=false
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+      - CLOUDFLARE_CONFIG_BALANCER_0_AUTHENTICATION_APITOKEN=1234567890abcdef1234567890
+      - CLOUDFLARE_CONFIG_BALANCER_0_AUTHENTICATION_APIKEY=0987654321abcdef0987654321
+      - CLOUDFLARE_CONFIG_BALANCER_0_AUTHENTICATION_ACCOUNTEMAIL=user2@example_com
+      - CLOUDFLARE_CONFIG_BALANCER_0_POOLID=your_pool_id_here
+      - CLOUDFLARE_CONFIG_BALANCER_0_ORIGIN=your_origin_name_here 
 ```
