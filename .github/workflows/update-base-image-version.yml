@@ -1,8 +1,9 @@
-name: Update Base Image Version File
+name: Update Version File
 
 on:
   schedule:
     - cron: '0 0 * * *' # Runs every day at midnight UTC (adjust as needed)
+  workflow_dispatch:
 
 jobs:
   update-version:
@@ -23,10 +24,25 @@ jobs:
           VERSION=$(curl -s https://api.github.com/repos/timothymiller/cloudflare-ddns/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
           echo "::set-output name=version::$VERSION"
 
-      - name: Update version file
-        run: echo "${{ steps.get-version.outputs.version }}" > base_version.txt
+      - name: Check if version has changed
+        id: check-version
+        run: |
+          CURRENT_VERSION=$(cat base_version.txt)
+          if [ "${{ steps.get-version.outputs.version }}" != "$CURRENT_VERSION" ]; then
+            echo "Versions differ, updating version file."
+            echo "::set-output name=version_changed::true"
+          else
+            echo "Versions are the same, no update needed."
+            echo "::set-output name=version_changed::false"
+          fi
 
-      - name: Commit and push changes
+      - name: Update version file if changed
+        if: steps.check-version.outputs.version_changed == 'true'
+        run: |
+          echo "${{ steps.get-version.outputs.version }}" > base_version.txt
+
+      - name: Commit and push changes if updated
+        if: steps.check-version.outputs.version_changed == 'true'
         run: |
           git add base_version.txt
           git commit -m "Update base image version to latest release"
