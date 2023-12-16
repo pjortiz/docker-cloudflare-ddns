@@ -56,5 +56,5 @@ jobs:
         if: steps.check-version.outputs.version_changed == 'true'
         run: |
           git add base_version.txt
-          git commit -m "Update base image version to latest release"
+          git commit -m "Update base image version to latest release ${{ steps.get-latest-version.outputs.version }}"
           git push origin main
