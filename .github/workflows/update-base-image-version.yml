@@ -1,0 +1,33 @@
+name: Update Base Image Version File
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC (adjust as needed)
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Git credentials
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Get latest release version
+        id: get-version
+        run: |
+          VERSION=$(curl -s https://api.github.com/repos/timothymiller/cloudflare-ddns/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "::set-output name=version::$VERSION"
+
+      - name: Update version file
+        run: echo "${{ steps.get-version.outputs.version }}" > base_version.txt
+
+      - name: Commit and push changes
+        run: |
+          git add base_version.txt
+          git commit -m "Update base image version to latest release"
+          git push origin main
