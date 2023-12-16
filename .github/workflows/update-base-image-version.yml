@@ -18,25 +18,36 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Get latest release version
+      - name: Get latest release version commit
         id: get-version
         run: |
-          VERSION=$(curl -s https://api.github.com/repos/timothymiller/cloudflare-ddns/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          RELEASE_INFO=$(curl -s https://api.github.com/repos/timothymiller/cloudflare-ddns/releases/latest)
+          VERSION=$(echo "$RELEASE_INFO" | grep '"sha":' | sed -E 's/.*"([^"]+)".*/\1/')
           # echo "::set-output name=version::$VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+      - name: Create version file if it doesn't exist
+        if: steps.check-version-file.outputs.file_exists == 'false'
+        run: |
+          echo "${{ steps.get-latest-release.outputs.version }}" > base_version.txt
 
       - name: Check if version has changed
         id: check-version
         run: |
-          CURRENT_VERSION=$([ -f base_version.txt ] && cat base_version.txt)
-          if [ "${{ steps.get-version.outputs.version }}" != "$CURRENT_VERSION" ]; then
-            echo "Versions differ, updating version file."
-            # echo "::set-output name=version_changed::true"
-            echo "version_changed=true" >> $GITHUB_OUTPUT
+          if [ -f version.txt ]; then
+            CURRENT_VERSION=$(cat base_version.txt)
+            if [ "${{ steps.get-version.outputs.version }}" != "$CURRENT_VERSION" ]; then
+              echo "Versions differ, updating version file."
+              # echo "::set-output name=version_changed::true"
+              echo "version_changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "Versions are the same, no update needed."
+              # echo "::set-output name=version_changed::false"
+              echo "version_changed=false" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "Versions are the same, no update needed."
-            # echo "::set-output name=version_changed::false"
-            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version file does not exist."
+            echo "version_changed=true" >> $GITHUB_OUTPUT  # Indicate change to create the file
           fi
 
       - name: Update version file if changed
