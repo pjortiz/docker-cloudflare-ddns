@@ -24,7 +24,7 @@ jobs:
       - name: Get latest release version commit
         id: get-latest-version
         run: |
-          VERSION=$(git ls-remote --tags https://github.com/username/repo.git refs/tags/latest | cut -f1)
+          VERSION=$(git ls-remote --tags https://github.com/timothymiller/cloudflare-ddns.git refs/tags/latest | cut -f1)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if version has changed
